@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Склад Влагамакс</title>
+<meta name="apple-mobile-web-app-title" content="Склад">
+<meta name="theme-color" content="#24447c">
+<meta name="robots" content="noindex, nofollow">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+:root{--bg:#f3f5f8;--card:#fff;--ink:#1d2430;--muted:#6b7480;--line:#e2e6ec;--pri:#24447c;--pri2:#e8eef7}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 40px}
+.head{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.head img{width:64px;height:64px;border-radius:15px}
+h1{font-size:21px;margin:0}
+h2{font-size:17px;margin:22px 0 8px}
+.muted{color:var(--muted);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0}
+ol{margin:6px 0;padding-left:22px}
+li{margin:6px 0}
+.btn{display:block;text-align:center;background:var(--pri);color:#fff;text-decoration:none;font-weight:600;border-radius:12px;padding:15px;margin:18px 0 6px}
+.note{background:var(--pri2);border-radius:10px;padding:10px 12px;font-size:14px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head"><img src="icon-180.png" alt=""><div><h1>Склад Влагамакс</h1><div class="muted" id="sub">Открываю склад…</div></div></div>
+
+  <div id="setup" class="hidden">
+    <p>Добавьте склад на экран телефона - он будет открываться одним нажатием, как приложение.</p>
+
+    <div class="card" id="ios">
+      <h2 style="margin-top:0">iPhone</h2>
+      <ol>
+        <li>Откройте эту страницу в <b>Safari</b>.</li>
+        <li>Нажмите <b>«Поделиться»</b> - квадрат со стрелкой вверх (внизу или вверху экрана).</li>
+        <li>Пролистайте список и выберите <b>«На экран «Домой»»</b>.</li>
+        <li>Если есть переключатель <b>«Открыть как веб-приложение»</b> - выключите его: так склад откроется в Safari, где вы уже вошли в Google.</li>
+        <li>Название оставьте <b>«Склад»</b> и нажмите <b>«Добавить»</b>.</li>
+      </ol>
+    </div>
+
+    <div class="card" id="android">
+      <h2 style="margin-top:0">Android</h2>
+      <ol>
+        <li>Откройте эту страницу в <b>Chrome</b>.</li>
+        <li>Нажмите меню <b>⋮</b> справа вверху.</li>
+        <li>Выберите <b>«Добавить на главный экран»</b> (может называться «Установить приложение»).</li>
+        <li>Нажмите <b>«Добавить»</b>.</li>
+      </ol>
+    </div>
+
+    <h2>Первый запуск</h2>
+    <div class="card">
+      <ol>
+        <li>Войдите в Google под той почтой, которой открыт доступ к складу.</li>
+        <li>Google один раз спросит разрешение: <b>«Дополнительные настройки»</b> → <b>«Перейти на страницу…»</b> → <b>«Разрешить»</b>.</li>
+      </ol>
+      <p class="note">Серую плашку «Это приложение создано пользователем Google Apps Script» можно закрыть крестиком. Она безопасна: так Google помечает все программы, которые сделаны на его платформе с обычного аккаунта.</p>
+    </div>
+  </div>
+
+  <a class="btn" id="open" href="#">Открыть склад</a>
+  <p class="muted" id="hint">Если склад не открылся сам - нажмите кнопку.</p>
+</div>
+
+<script>
+var FORM = 'https://script.google.com/macros/s/AKfycbx1lNpI_fCm_GLSdEjcv3eUYArDBlk4JJZFCyotuF8JbvtCUgoZPOM8l4qslGAcrmyLWA/exec';
+document.getElementById('open').href = FORM;
+var setup = /[?&]ustanovka/.test(location.search);
+if (setup) {
+  document.getElementById('setup').className = '';
+  document.getElementById('sub').textContent = 'Установка на телефон';
+  document.getElementById('hint').textContent = 'Кнопка - чтобы проверить, что склад открывается.';
+  var ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/.test(ua)) document.getElementById('android').className = 'card hidden';
+  else if (/Android/.test(ua)) document.getElementById('ios').className = 'card hidden';
+  // на экран «Домой» сохраняется адрес без ?ustanovka - с иконки склад откроется сразу
+  try { history.replaceState(null, '', location.pathname); } catch (e) {}
+} else {
+  location.replace(FORM);
+}
+</script>
+</body>
+</html>

@@ -8,8 +8,8 @@
 <meta name="theme-color" content="#24447c">
 <meta name="robots" content="noindex, nofollow">
 <link rel="apple-touch-icon" href="icon-180.png">
-<link rel="icon" type="image/png" href="icon-192.png">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<!-- без manifest: его start_url потерял бы личный ключ в адресе иконки -->
 <style>
 :root{--bg:#f3f5f8;--card:#fff;--ink:#1d2430;--muted:#6b7480;--line:#e2e6ec;--pri:#24447c;--pri2:#e8eef7}
 *{box-sizing:border-box}
@@ -59,9 +59,11 @@ li{margin:6px 0}
     <h2>Первый запуск</h2>
     <div class="card">
       <ol>
-        <li>Войдите в Google под той почтой, которой открыт доступ к складу.</li>
-        <li>Google один раз спросит разрешение: <b>«Дополнительные настройки»</b> → <b>«Перейти на страницу…»</b> → <b>«Разрешить»</b>.</li>
+        <li>Если склад попросит войти в Google - войдите под любой своей почтой.</li>
+        <li>Придумайте PIN-код из 4 цифр. Телефон его запомнит, снова спросит только на новом телефоне.</li>
+        <li>Склад узнает вас по этой ссылке: на главном экране будет «Вы: ваше имя».</li>
       </ol>
+      <p class="note">Ссылка личная: всё, что вы проведёте, запишется на ваше имя. Не пересылайте её другим - для нового сотрудника руководитель сделает свою.</p>
       <p class="note">Серую плашку «Это приложение создано пользователем Google Apps Script» можно закрыть крестиком. Она безопасна: так Google помечает все программы, которые сделаны на его платформе с обычного аккаунта.</p>
     </div>
   </div>
@@ -72,7 +74,12 @@ li{margin:6px 0}
 
 <script>
 var FORM = 'https://script.google.com/macros/s/AKfycbx1lNpI_fCm_GLSdEjcv3eUYArDBlk4JJZFCyotuF8JbvtCUgoZPOM8l4qslGAcrmyLWA/exec';
-document.getElementById('open').href = FORM;
+// личный ключ сотрудника (?k=…): передаём в форму; запоминаем на случай, если иконку сохранили без него
+var m = /[?&]k=([0-9a-f]{32})(?:&|$)/.exec(location.search);
+var key = m ? m[1] : '';
+try { if (key) localStorage.setItem('vm_sklad_k', key); else key = localStorage.getItem('vm_sklad_k') || ''; } catch (e) {}
+var target = FORM + (key ? '?k=' + key : '');
+document.getElementById('open').href = target;
 var setup = /[?&]ustanovka/.test(location.search);
 if (setup) {
   document.getElementById('setup').className = '';
@@ -81,10 +88,10 @@ if (setup) {
   var ua = navigator.userAgent;
   if (/iPhone|iPad|iPod/.test(ua)) document.getElementById('android').className = 'card hidden';
   else if (/Android/.test(ua)) document.getElementById('ios').className = 'card hidden';
-  // на экран «Домой» сохраняется адрес без ?ustanovka - с иконки склад откроется сразу
-  try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  // на экран «Домой» сохраняется адрес с ключом, но без ?ustanovka - с иконки склад откроется сразу
+  try { history.replaceState(null, '', location.pathname + (key ? '?k=' + key : '')); } catch (e) {}
 } else {
-  location.replace(FORM);
+  location.replace(target);
 }
 </script>
 </body>
